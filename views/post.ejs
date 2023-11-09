@@ -1,0 +1,222 @@
+<%- include('./layouts/header.ejs') %>
+
+<!-- Page content-->
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Post content-->
+      <article>
+        <!-- Post header-->
+        <header class="mb-4">
+          <!-- Post title-->
+          <h1 class="fw-bolder mb-1"><%= post.title %></h1>
+          <!-- Post meta content-->
+          <div class="text-muted fst-italic mb-2">Posted by Admin</div>
+          <!-- Post categories-->
+          <!-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>
+                    <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> -->
+        </header>
+        <!-- Preview image figure-->
+        <figure class="mb-4">
+          <%
+                   if (post.image !== undefined && post.image !== '') {
+                        
+                        %>
+                        
+                           <img class="img-fluid rounded mb-4 mb-lg-0" src="<%= post.image %>" alt="..." />
+                        <%
+                    
+                   } 
+                   else {
+
+                        %>
+                             <img class="img-fluid rounded mb-4 mb-lg-0" src="https://dummyimage.com/900x400/dee2e6/6c757d.jpg" alt="..." />
+
+                        <%
+                    
+                   }
+                %>
+        </figure>
+        <!-- Post content-->
+        <section class="mb-5">
+          <p class="fs-5 mb-4"><%= post.content %></p>
+        </section>
+      </article>
+      <!-- Comments section-->
+      <section class="mb-5">
+        <div class="card bg-light">
+          <div class="card-body">
+            <!-- Comment form-->
+            <h4>Leave a Comment</h4>
+            <form class="mb-4" id="comment-form">
+              <input type="hidden" name="post_id" value="<%= post._id %>" />
+              <input
+                type="text"
+                name="username"
+                placeholder="Enter your name "
+                required
+                class="form-control mb-3"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email "
+                required
+                class="form-control mb-3"
+              />
+              <textarea
+                class="form-control"
+                name="comment"
+                required
+                rows="3"
+                placeholder="Join the discussion and leave a comment!"
+              ></textarea>
+              <input type="submit" class="btn btn-success mt-3" />
+            </form>
+
+            <p class="com-status" style="color: rgb(0, 122, 2)"></p>
+
+             
+            <%  
+              if(post.comments.length >=0 ){
+                  post.comments = post.comments.reverse();
+                  post.comments.forEach(function(comment){
+                      %>
+                    <div class="d-flex mt-3">
+                         <div class="flex-shrink-0"> <img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."/> </div>
+                         <div class="ms-3">
+                             <div class="fw-bold"><%= comment.username %></div>
+                             <%= comment.comment %>
+
+                             <%
+
+                                if(comment.replies){
+                                  comment.replies.forEach(function(reply){
+                                    %>
+                                     
+                                    <div class="d-flex mt-3 mb-3">
+                                          <div class="flex-shrink-0"> <img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."/> </div>
+                                          <div class="ms-3">
+                                               <div class="fw-bold"><%= reply.name %></div>
+                                               <%= reply.reply %>
+                                              </div>
+                                     </div>
+
+
+
+                                    <%
+
+                                  });
+                                }    
+
+                             %>
+
+
+                             <div class="col-md-12">
+                              <form action="" class="do-reply">
+                                <input type="hidden" name="post_id" value="<%= post._id %>">
+                                <input type="hidden" name="comment_id" value="<%= comment._id %>">
+                                <div class="form-group">
+                                  <input type="text" class="form-control" name="name" placeholder="Enter Name" required>
+                                  </div>
+                                <div class="form-group">
+                                  <textarea name="reply"  class="form-control" name="name" placeholder="Enter Reply" required></textarea>
+                                  </div>
+                                  <input type="submit" value="reply" class="btn btn-info mt-3">
+
+                              </form>
+                              </div>
+                              
+                            
+                             </div>
+                    </div>
+                    <%
+
+
+
+                  });
+                } 
+            
+            %>
+            
+
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- Side widgets-->
+    <div class="col-lg-4">
+      <!-- Search widget-->
+      <div class="card mb-4">
+        <div class="card-header">Search</div>
+        <div class="card-body">
+          <div class="input-group">
+            <input
+              class="form-control"
+              type="text"
+              placeholder="Enter search term..."
+              aria-label="Enter search term..."
+              aria-describedby="button-search"
+            />
+            <button class="btn btn-primary" id="button-search" type="button">
+              Go!
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+  // $(document).ready(function () {
+    $(document).ready(function () {
+
+
+
+
+
+
+    $("#comment-form").submit(function (event) {
+      event.preventDefault();
+
+      var formData = $(this).serialize();
+      // console.log(formData);
+
+      $.ajax({
+        url: "/add-comment",
+        type: "POST",
+        data: formData,
+        success: function (data) {
+          $(".com-status").text(data.msg);
+          setTimeout(function () {
+            $(".com-status").text("");
+          }, 5000);
+        },
+      });
+    });
+
+    $('.do-reply').submit(function(event){
+      event.preventDefault();
+
+      var formData = $(this).serialize();
+      var obj= $(this);
+
+      $.ajax({
+        url: "/do-reply",
+        type: "POST",
+        data: formData,
+        success: function (data) {
+          $(obj).trigger("reset"); // Reset the form
+          $(obj).parent().parent().append('<p>' + data.msg + '</p>');
+        }
+      });
+
+      
+    })
+  });
+</script>
+
+<%- include('./layouts/footer.ejs') %>
