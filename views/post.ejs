@@ -76,7 +76,7 @@
 
             <p class="com-status" style="color: rgb(0, 122, 2)"></p>
 
-             
+          <div id="comment-section">
             <%  
               if(post.comments.length >=0 ){
                   post.comments = post.comments.reverse();
@@ -88,6 +88,7 @@
                              <div class="fw-bold"><%= comment.username %></div>
                              <%= comment.comment %>
 
+                             <div id="replies-<%= comment._id%>">
                              <%
 
                                 if(comment.replies){
@@ -110,12 +111,14 @@
                                 }    
 
                              %>
+                            </div>
 
 
                              <div class="col-md-12">
                               <form action="" class="do-reply">
                                 <input type="hidden" name="post_id" value="<%= post._id %>">
                                 <input type="hidden" name="comment_id" value="<%= comment._id %>">
+                                <input type="hidden" name="comment_email" value="<%= comment.email %>">
                                 <div class="form-group">
                                   <input type="text" class="form-control" name="name" placeholder="Enter Name" required>
                                   </div>
@@ -138,6 +141,7 @@
                 } 
             
             %>
+          </div
             
 
           </div>
@@ -170,6 +174,8 @@
 
 <script>
 
+  var socket = io();
+
 
   // $(document).ready(function () {
     $(document).ready(function () {
@@ -182,7 +188,11 @@
     $("#comment-form").submit(function (event) {
       event.preventDefault();
 
-      var formData = $(this).serialize();
+      var formData = {};   //$(this).serialize()
+      $.each($(this).serializeArray(),function(i,field){
+        formData[field.name] = field.value;
+
+      });
       // console.log(formData);
 
       $.ajax({
@@ -190,18 +200,57 @@
         type: "POST",
         data: formData,
         success: function (data) {
+
+          formData._id = data._id;
+
+          socket.emit("new_comment",formData);
+
+          
           $(".com-status").text(data.msg);
           setTimeout(function () {
-            $(".com-status").text("");
+            $(".com-status").text('');
           }, 5000);
         },
       });
     });
 
+
+    //real-time comment show
+    socket.on("new_comment",function(comment){
+
+      var html = '';
+
+      html += `
+
+      <div class="d-flex mt-3">
+                         <div class="flex-shrink-0"> <img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."/> </div>
+                         <div class="ms-3">
+                             <div class="fw-bold">`+comment.username+`</div>
+                             `+comment.comment+` 
+
+                            
+
+
+                            
+                              
+                            
+                             </div>
+                    </div>
+
+      `;
+      $('#comment-section').prepend(html);
+
+
+    });
+
     $('.do-reply').submit(function(event){
       event.preventDefault();
 
-      var formData = $(this).serialize();
+      var formData = {};   //$(this).serialize()
+      $.each($(this).serializeArray(),function(i,field){
+        formData[field.name] = field.value; 
+
+      })
       var obj= $(this);
 
       $.ajax({
@@ -209,6 +258,9 @@
         type: "POST",
         data: formData,
         success: function (data) {
+
+          formData._id = data._id;
+          socket.emit("new_reply",formData);
           $(obj).trigger("reset"); // Reset the form
           $(obj).parent().parent().append('<p>' + data.msg + '</p>');
         }
@@ -216,6 +268,30 @@
 
       
     })
+
+    // real-time reply show
+
+    socket.on("new_reply",function(reply){
+
+      var html = '';
+
+      html += `
+
+      <div class="d-flex mt-3 mb-3">
+                                          <div class="flex-shrink-0"> <img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."/> </div>
+                                          <div class="ms-3">
+                                               <div class="fw-bold">`+reply.name+`</div>
+                                               `+reply.reply+`
+                                              </div>
+                                     </div>
+
+
+
+
+      `;
+      $('#replies-'+reply.comment_id).append(html);
+
+    });
   });
 </script>
 

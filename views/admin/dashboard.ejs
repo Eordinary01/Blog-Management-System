@@ -1,6 +1,52 @@
 <%- include('../layouts/admin-header.ejs') %>
 <div id="content" class="p-4 p-md-5 pt-5">
   <h2 class="mb-4">Dashboard</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Image</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% 
+      if (posts.length >0) {
+        var i=1;
+
+        posts.forEach(function(post){
+          %>
+          <tr>
+
+            <td><%= i++; %></td>
+            <td><%= post.title %></td>
+            <td><%= post.content %></td>
+            <td>
+              <img src="<%= post.image %>" alt="<%= post.image %>" width="100px">
+            </td>
+          </tr>
+
+
+          <%
+
+        });
+        
+      } else {
+        %>
+        <tr>
+          <td colspan="4">There is no Post here!</td>
+
+        </tr>
+        <%
+        
+      }
+        
+        %>
+    </tbody>
+
+  </table>
 </div>
 
 <%- include('../layouts/admin-footer.ejs') %>

@@ -86,7 +86,8 @@ const blogSetupSave = async(req,res)=>{
 const dashboard = async(req,res)=>{
     try {
         
-        res.render('admin/dashboard');
+        const allPosts = await Post.find({});
+        res.render('admin/dashboard',{posts:allPosts});
     } catch (error) {
         console.log(error.message);
         
@@ -124,10 +125,14 @@ const addPost = async(req,res)=>{
 
         const postData = await post.save();
 
-        res.render('admin/postDashboard',{message:'Post added Successfully!'});
+        res.send({success:true,msg:'Post Added Successfully!!',_id:postData._id });
+        
+        // res.render('admin/postDashboard',{message:'Post added Successfully!'});
         
     } catch (error) {
-        console.log(error.message);
+        res.send({success:false,msg:error.message });
+        // console.log(error.message);
+        
         
     }
 }
