@@ -9,6 +9,8 @@
         <th>Title</th>
         <th>Content</th>
         <th>Image</th>
+        <th>Delete</th>
+        <th>Edit</th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +27,12 @@
             <td><%= post.content %></td>
             <td>
               <img src="<%= post.image %>" alt="<%= post.image %>" width="100px">
+            </td>
+            <td>
+              <a href="#" class="btn btn-danger deletePost" data-id="<%= post._id %>">Delete</a>
+            </td>
+            <td>
+              <a href="/edit-post/<%= post._id %>" target="_blank" class="btn btn-success ">Edit</a>
             </td>
           </tr>
 
@@ -48,5 +56,31 @@
 
   </table>
 </div>
+
+
+<script>
+  $(document).ready(function(){
+    $('.deletePost').click(function(){
+      var postId = $(this).attr('data-id');
+      var obj = $(this);
+
+      $.ajax({
+        url:"/delete-post",
+        type:"POST",
+        data:{id:postId},
+        success:function(response){
+          if(response.success == true){
+            $(obj).parent().parent().remove;
+            alert(response.msg);
+          }
+          else{
+            alert(response.msg);
+            
+          }
+        }
+      })
+    });
+  });
+</script>
 
 <%- include('../layouts/admin-footer.ejs') %>

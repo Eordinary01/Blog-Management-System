@@ -153,6 +153,57 @@ const uploadPostImage = async(req,res)=>{
     }
 }
 
+const deletePost =async(req,res)=>{
+    try {
+
+        await Post.deleteOne({_id: req.body.id});
+        res.status(200).send({success:true,msg:"The post has been deleted!"});
+        
+    } catch (error) {
+        res.status(400).send({success:false,msg:error.message});
+        
+    }
+}
+
+const LoadEditPost = async(req,res)=>{
+    try {
+
+        var postData = await Post.findOne({_id:req.params.id});
+
+        res.render('admin/editPost', {post:postData});
+        
+    } catch (error) {
+        console.log(error.message);
+        
+    }
+}
+
+const updatePost = async(req,res)=>{
+
+    try {
+
+       await  Post.findByIdAndUpdate({_id:req.body.id}, {
+
+        $set:{
+            title:req.body.title,
+            content:req.body.content,
+        }
+
+        });
+
+      
+        res.status(200).send({success:true,msg:"The post has been Updated!"});
+        
+    } catch (error) {
+        res.status(400).send({success:false,msg:error.message});
+        
+    }
+}
+
+   
+
+
+
 module.exports = {
     blogSetup,
     dashboard,
@@ -160,5 +211,8 @@ module.exports = {
     loadPostDashboard,
     addPost,
     securepassword,
-    uploadPostImage
+    uploadPostImage,
+    deletePost,
+    LoadEditPost,
+    updatePost
 }
