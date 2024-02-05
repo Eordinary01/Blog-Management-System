@@ -187,6 +187,7 @@ const updatePost = async(req,res)=>{
         $set:{
             title:req.body.title,
             content:req.body.content,
+            image:req.body.image
         }
 
         });

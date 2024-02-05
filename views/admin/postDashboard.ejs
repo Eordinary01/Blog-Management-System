@@ -74,7 +74,7 @@
     <script>
 
 
-      
+
       $(document).ready(function () {
 
 
@@ -109,7 +109,7 @@
           var obj = $(this);
 
           var formData = {};
-          $.each($(this).serializeArray(),function(i,field){
+          $.each($(this).serializeArray(), function (i, field) {
             formData[field.name] = field.value;
 
           });
@@ -121,7 +121,7 @@
             data: formData,
             success: function (data) {
               if (data.success == true) {
-                
+
                 alert(data.msg);
                 $(obj)[0].reset();
                 $('#image').val('');
@@ -130,7 +130,7 @@
 
                 var socket = io();
                 socket.emit("new_post", formData);
-                
+
 
               }
               else {

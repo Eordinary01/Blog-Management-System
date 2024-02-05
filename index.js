@@ -47,7 +47,13 @@ io.on("connection",function(socket){
         io.emit("new_reply",reply);
     });
 
+    socket.on("delete_post", function(postId){
+        socket.broadcast.emit("delete_post", postId);
+    });
+
 });
+
+
 
 http.listen(8800, function(){
     console.log("Server is running");
