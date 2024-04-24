@@ -56,7 +56,7 @@ io.on("connection",function(socket){
 
 
 http.listen(8800, function(){
-    console.log("Server is running");
+    console.log("Server is running at 8800");
 });
 
 
