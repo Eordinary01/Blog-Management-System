@@ -1,8 +1,9 @@
-const sessionSecret = "blogsessionusersercet"
+const sessionSecret = "blogsessionuserssecret";
 
-const emailUser = "parth.manocha2901@gmail.com";
-const emailPassword = "tqpo ksgw lxgs uiyp";
-module.exports ={
+const emailUser = "";
+const emailPassword = "";
+
+module.exports = {
     sessionSecret,
     emailUser,
     emailPassword

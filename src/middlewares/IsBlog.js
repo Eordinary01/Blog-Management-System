@@ -1,20 +1,21 @@
-const BlogSetting = require("../models/blogsettingmodel");
+const BlogSetting = require("../models/blogSettingModel");
 
-const IsBlog = async(req,res,next)=>{
-    try{
-        const blogsetting = await BlogSetting.find({});
-        
+const isBlog = async(req,res,next)=>{
+    try {
 
-        if(blogsetting.length == 0 && req.originalUrl != "/blog-setup" ){
+        const blogSetting = await BlogSetting.find({});
+        if(blogSetting.length == 0 && req.originalUrl != "/blog-setup"){
             res.redirect('/blog-setup');
         }
         else{
             next();
         }
-    }catch(error){
+        
+    } catch (error) {
         console.log(error.message);
     }
 }
+
 module.exports = {
-    IsBlog
+    isBlog
 }

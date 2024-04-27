@@ -11286,3 +11286,9 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+
+/* like dislike css */
+.disabled{
+  pointer-events: none;
+  color: grey;
+}

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const UsersettingSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
 
     name:{
         type:String,
@@ -16,14 +16,14 @@ const UsersettingSchema = mongoose.Schema({
     },
     is_admin:{
         type:String,
-        required:true
+        required:false,
+        default:0
     },
     token:{
         type:String,
         default:''
-       
-    },
+    }
 
 });
 
-module.exports = mongoose.model('User',UsersettingSchema);
+module.exports = mongoose.model('User',userSchema);

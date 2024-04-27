@@ -1,19 +1,20 @@
 const mongoose = require("mongoose");
 
- const blogsettingSchema= mongoose.Schema({
+const blogSettingSchema = mongoose.Schema({
 
-    blog_Title:{
+    blog_title:{
         type:String,
         required:true
     },
-    blog_Logo:{
+    blog_logo:{
         type:String,
         required:true
     },
     description:{
         type:String,
         required:true
-    },
-})
+    }
 
-module.exports = mongoose.model('BlogSetting',blogsettingSchema);
+});
+
+module.exports = mongoose.model('BlogSetting',blogSettingSchema);
