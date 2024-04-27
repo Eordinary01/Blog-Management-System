@@ -1,5 +1,5 @@
 const BlogSetting = require('../models/blogsettingmodel');
-const User = require('../models/userModel');
+const User = require('../models/Usermodel');
 const Post = require('../models/postModel');
 const Setting = require('../models/settingModel');
 const bcrypt = require('bcrypt');
