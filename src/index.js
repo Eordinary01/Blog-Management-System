@@ -8,7 +8,7 @@ var http = require('http').createServer(app);
 var { Server } = require('socket.io');
 var io = new Server(http,{});
 
-const isBlog = require("./middlewares/isBlog");
+const isBlog = require("./middlewares/IsBlog");
 
 app.use(isBlog.isBlog);
 
