@@ -1,4 +1,4 @@
-const BlogSetting = require("../models/blogSettingModel");
+const BlogSetting = require("../models/blogsettingmodel");
 
 const isBlog = async(req,res,next)=>{
     try {
