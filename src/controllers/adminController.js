@@ -1,4 +1,4 @@
-const BlogSetting = require('../models/blogSettingModel');
+const BlogSetting = require('../models/blogsettingmodel');
 const User = require('../models/userModel');
 const Post = require('../models/postModel');
 const Setting = require('../models/settingModel');
