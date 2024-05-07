@@ -8,7 +8,7 @@ const blogSettingSchema = mongoose.Schema({
     },
     blog_logo:{
         type:String,
-        required:true
+        
     },
     description:{
         type:String,

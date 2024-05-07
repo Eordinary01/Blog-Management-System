@@ -42,7 +42,7 @@ const blogSetupSave = async(req,res)=>{
     try {
         
         const blog_title = req.body.blog_title;
-        const blog_image = req.file.filename;
+        // const blog_image = req.file.filename;
         const description = req.body.description;
         const email = req.body.email;
         const name = req.body.name;
@@ -50,7 +50,7 @@ const blogSetupSave = async(req,res)=>{
 
         const blogSetting = new BlogSetting({
             blog_title:blog_title,
-            blog_logo:blog_image,
+            // blog_logo:blog_image,
             description:description
         });
 
