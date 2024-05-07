@@ -43,25 +43,28 @@ const sendCommentMail = async(name, email, post_id) => {
 
 }
 
-const loadBlog = async(req,res)=>{
-
+const loadBlog = async (req, res) => {
     try {
-
         var setting = await Setting.findOne({});
+        if (!setting) {
+            console.log("No setting found in the database.");
+            return res.status(500).send("Internal Server Error");
+        }
 
         var limit = setting.post_limit;
 
         const posts = await Post.find({}).limit(limit);
-        res.render('blog',{
-            posts:posts,
-            postLimit:limit
+        res.render('blog', {
+            posts: posts,
+            postLimit: limit
         });
 
     } catch (error) {
         console.log(error.message);
+        res.status(500).send("Internal Server Error");
     }
-
 }
+
 
 const loadPost = async(req,res) =>{
     try {
