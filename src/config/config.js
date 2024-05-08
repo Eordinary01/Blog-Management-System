@@ -1,7 +1,7 @@
 const sessionSecret = "blogsessionuserssecret";
 
-const emailUser = "";
-const emailPassword = "";
+const emailUser = "companytech36@gmail.com";
+const emailPassword = "kkpmidqratctnlit";
 
 module.exports = {
     sessionSecret,
