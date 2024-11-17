@@ -1,286 +1,373 @@
-<%- include('./layouts/header.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= post.title %></title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .post-header {
+            position: relative;
+            padding: 3rem 0;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("<%= post.image || 'https://dummyimage.com/900x400/ced4da/6c757d.jpg' %>");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
 
-<!-- Page content-->
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Post content-->
-            <article>
-                <!-- Post header-->
-                <header class="mb-4">
-                    <!-- Post title-->
-                    <h1 class="fw-bolder mb-1"><%= post.title %></h1>
-                    <!-- Post meta content-->
-                    <div class="text-muted fst-italic mb-2">Posted by Admin 
-                        <b id="views_count">
-                            <%
-                                if(post.views !== undefined){
-                                    %>
-                                    <%= post.views+1 %> Views
-                                    <%
-                                }
-                                else{
-                                    %>
-                                    <%= 1 %> Views
-                                    <%
-                                }
-                            %>
-                        </b>
-                    </div>
-                    <!-- Post categories-->
-                    <!-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a> -->
-                    <!-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> -->
-                </header>
-                <!-- Preview image figure-->
-                <figure class="mb-4">
-                    <%
-                        if(post.image !== undefined && post.image !== ''){
-                            %>
-                            <img class="img-fluid rounded mb-4 mb-lg-0" src="<%= post.image %>" alt="..." />
-                            <%
-                        }
-                        else{
-                            %>
-                                <img class="img-fluid rounded mb-4 mb-lg-0" src="https://dummyimage.com/900x400/ced4da/6c757d.jpg" alt="..." />
-                            <%
-                        }
-                    %>
-                </figure>
-                <!-- Post content-->
-                <section class="mb-5">
-                    <p class="fs-5 mb-4"><%- post.content %> </p>
-                </section>
-            </article>
-            
-            <!-- like dislike icons start -->
-            <div style="font-size: 20px;">
-                <div class="row">
-                    <div class="col-md-1">
-                        <i class="fa fa-thumbs-up"></i>
+        .post-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-meta {
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .interaction-bar {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .interaction-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .interaction-item:hover {
+            transform: scale(1.1);
+        }
+
+        .interaction-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .comment-box {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .reply-form {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .reply-toggle {
+            color: #0d6efd;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .search-container {
+            position: sticky;
+            top: 1rem;
+        }
+
+        .animate-comment {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('./layouts/header.ejs') %>
+
+    <!-- Post Header -->
+    <header class="post-header">
+        <div class="container">
+            <h1 class="post-title fw-bolder"><%= post.title %></h1>
+            <div class="post-meta">
+                Posted by Admin | <span id="views_count">
+                    <%= (post.views !== undefined ? post.views + 1 : 1) %> Views
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post Content -->
+                <article class="comment-box">
+                    <section class="post-content">
+                        <%- post.content %>
+                    </section>
+                </article>
+
+                <!-- Interaction Bar -->
+                <div class="interaction-bar">
+                    <div class="interaction-item" id="like-button">
+                        <i class="fa-solid fa-thumbs-up"></i>
                         <span id="like"><%= likes %></span>
                     </div>
-                    <div class="col-md-1">
-                        <i class="fa fa-thumbs-down"></i>
+                    <div class="interaction-item" id="dislike-button">
+                        <i class="fa-solid fa-thumbs-down"></i>
                         <span id="dislike"><%= dislikes %></span>
                     </div>
-                </div>
-            </div>
-            <!-- like dislike icons end -->
-
-            <!-- Comments section-->
-            <section class="mb-5 mt-3">
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <!-- Comment form-->
-                        <h5>Leave a comment</h5>
-                        <form class="mb-4" id="comment-form">
-                            <input type="hidden" name="post_id" value="<%= post._id %>">
-                            <input type="text" name="username" placeholder="Enter your name" required class="form-control mb-3">
-                            <input type="email" name="email" placeholder="Enter your mail" required class="form-control mb-3">
-                            
-                            <textarea class="form-control" name="comment" required rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
-                            
-                            <input type="submit" class="btn btn-primary mt-3">
-                        </form>
-
-                        <p class="com-status" style="color: green;"></p>
-
-                        
-                        <!-- Comment with nested comments-->
-                        <div id="comment-section">
-                        <% 
-                            if(post.comments.length >= 0){
-                                post.comments = post.comments.reverse();
-                                post.comments.forEach(function(comment){
-                                    %>
-                                    <div class="d-flex mt-3">
-                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                        <div class="ms-3">
-                                            <div class="fw-bold"><%= comment.username %></div>
-                                            <%= comment.comment %>
-                                            
-                                            <div id="replies-<%= comment._id %>">
-                                            <%
-                                                if(comment.replies){
-                                                    comment.replies.forEach(function(reply){
-                                                        %>
-                                                        <div class="d-flex mt-3 mb-3">
-                                                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                                            <div class="ms-3">
-                                                                <div class="fw-bold"><%= reply.name %></div>
-                                                                <%= reply.reply %>
-                                                            </div>
-                                                        </div>
-                                                        <%
-                                                    });
-                                                }
-                                            %>
-                                            </div>
-
-                                            <div class="col-md-12">
-                                                <form class="do-reply">
-                                                    <input type="hidden" name="post_id" value="<%= post._id %>">
-                                                    <input type="hidden" name="comment_id" value="<%= comment._id %>">
-                                                    <input type="hidden" name="comment_email" value="<%= comment.email %>">
-                                                    <div class="form-group">
-                                                        <input type="text" class="form-control" name="name" placeholder="Enter Name" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <textarea class="form-control" name="reply" placeholder="Enter Reply" required></textarea>
-                                                    </div>
-                                                    <input type="submit" value="Reply" class="btn btn-info btn-sm">
-                                                </form>
-                                            </div>
-
-                                            </div>
-                                    </div>
-                                    <%
-                                });
-                            }
-                        %>
-                        </div>
-
+                    <div class="interaction-item">
+                        <i class="fa-solid fa-comment"></i>
+                        <span id="comment-count"><%= post.comments.length %></span>
+                    </div>
+                    <div class="interaction-item">
+                        <i class="fa-solid fa-share"></i>
+                        <span>Share</span>
                     </div>
                 </div>
-            </section>
-        </div>
-        <!-- Side widgets-->
-        <div class="col-lg-4">
-            <!-- Search widget-->
-            <div class="card mb-4">
-                <div class="card-header">Search</div>
-                <div class="card-body">
-                    <div class="input-group">
-                        <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                        <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+
+                <!-- Comments Section -->
+                <section class="comments-section">
+                    <div class="comment-box">
+                        <h5>Leave a comment</h5>
+                        <form id="comment-form" class="mb-4">
+                            <input type="hidden" name="post_id" value="<%= post._id %>">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" name="username" class="form-control" placeholder="Your name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="email" name="email" class="form-control" placeholder="Your email" required>
+                                </div>
+                            </div>
+                            <textarea class="form-control mb-3" name="comment" rows="3" placeholder="Join the discussion..." required></textarea>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                        <p class="com-status text-success"></p>
+                    </div>
+
+                    <div id="comment-section">
+                        <% post.comments.reverse().forEach(function(comment) { %>
+                            <div class="comment-box animate-comment">
+                                <div class="d-flex">
+                                    <img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="...">
+                                    <div class="ms-3 flex-grow-1">
+                                        <div class="fw-bold"><%= comment.username %></div>
+                                        <p><%= comment.comment %></p>
+                                        
+                                        <div class="reply-toggle" onclick="toggleReplyForm('<%= comment._id %>')">
+                                            Reply
+                                        </div>
+
+                                        <div id="replies-<%= comment._id %>" class="mt-3">
+                                            <% if(comment.replies) { %>
+                                                <% comment.replies.forEach(function(reply) { %>
+                                                    <div class="d-flex mt-3">
+                                                        <img class="rounded-circle" src="https://dummyimage.com/40x40/ced4da/6c757d.jpg" alt="...">
+                                                        <div class="ms-3">
+                                                            <div class="fw-bold"><%= reply.name %></div>
+                                                            <p><%= reply.reply %></p>
+                                                        </div>
+                                                    </div>
+                                                <% }); %>
+                                            <% } %>
+                                        </div>
+
+                                        <form class="do-reply reply-form" id="reply-form-<%= comment._id %>">
+                                            <input type="hidden" name="post_id" value="<%= post._id %>">
+                                            <input type="hidden" name="comment_id" value="<%= comment._id %>">
+                                            <input type="hidden" name="comment_email" value="<%= comment.email %>">
+                                            <input type="text" class="form-control mb-2" name="name" placeholder="Your name" required>
+                                            <textarea class="form-control mb-2" name="reply" placeholder="Your reply" required></textarea>
+                                            <button type="submit" class="btn btn-sm btn-primary">Reply</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="search-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-search me-2"></i>Search
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group">
+                                <input class="form-control" type="text" placeholder="Search posts...">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    var socket = io();
-    var post_id = "<%= post._id %>";
-    $(document).ready(function(){
-        $('#comment-form').submit(function(event){
-            event.preventDefault();
+    <script>
+        const socket = io();
+        const post_id = "<%= post._id %>";
 
-            var formData = {};
-            $.each($(this).serializeArray(),function(i, field){
-                formData[field.name] = field.value;
-            });
-
-
-            $.ajax({
-                url:"/add-comment",
-                type:"POST",
-                data:formData,
-                success:function(data){
-
-                    formData._id = data._id;
-
-                    socket.emit("new_comment",formData);
-
-                    $('.com-status').text(data.msg);
-                    setTimeout(function(){
-                        $('.com-status').text('');
-                    },5000);
-                }
-            });
-
-        });
-
-        //realtime comment show
-        socket.on("new_comment",function(comment){
-
-            var html ='';
-
-            html +=`
-            <div class="d-flex mt-3">
-                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                    <div class="fw-bold">`+comment.username+`</div>
-                    `+comment.comment+`
-                </div>
-            </div>
-            `;
-            $('#comment-section').prepend(html);
-        });
-
-        $('.do-reply').submit(function(event){
-            event.preventDefault();
-
-            var formData = {};
-            $.each($(this).serializeArray(),function(i,field){
-                formData[field.name] = field.value;
-            });
-
-            var obj = $(this);
-            $.ajax({
-                url:"/do-reply",
-                type:"POST",
-                data:formData,
-                success:function(data){
-
-                    formData._id = data._id;
-                    socket.emit("new_reply",formData);
-
-                    $(obj)[0].reset();
-                    $(obj).parent().parent().append('<p>'+data.msg+'</p>');
-                }
-            });
-        });
-
-
-        socket.on("new_reply",function(reply){
-            console.log(reply)
-            var html = "";
-            html +=`
-            <div class="d-flex mt-3 mb-3">
-                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                    <div class="fw-bold">`+reply.name+`</div>
-                    `+reply.reply+`
-                </div>
-            </div>
-            `;
-            $('#replies-'+reply.comment_id).append(html);
-        });
-
-        socket.emit("increment_page_view",post_id);
-
-        socket.on("updated_views", function(data){
-            if(post_id == data._id){
-                $('#views_count').text(data.views+' Views');
-            }
-        });
-
-        //realtime like-dislike start
-        
-        if(userId ==  null){
-            $('.fa-thumbs-up').addClass('disabled');    
-            $('.fa-thumbs-down').addClass('disabled');
+        function toggleReplyForm(commentId) {
+            const form = document.getElementById(`reply-form-${commentId}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
-        
-        $('.fa-thumbs-up').click(function(){
-            socket.emit("like",{post_id:post_id,user_id:userId});
-        });
 
-        $('.fa-thumbs-down').click(function(){
-            socket.emit("dislike",{post_id:post_id,user_id:userId});
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
 
-        socket.on("like_dislike", function(data){
-            if(post_id == data.post_id){
-                $('#like').text(data.likes);
-                $('#dislike').text(data.dislikes);
+            // Comment form submission
+            const commentForm = document.getElementById('comment-form');
+            commentForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const formData = new FormData(commentForm);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch('/add-comment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+                    
+                    socket.emit('new_comment', { ...data, _id: result._id });
+                    
+                    commentForm.reset();
+                    document.querySelector('.com-status').textContent = result.msg;
+                    setTimeout(() => {
+                        document.querySelector('.com-status').textContent = '';
+                    }, 5000);
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+
+            // Reply form submission
+            document.querySelectorAll('.do-reply').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData.entries());
+
+                    try {
+                        const response = await fetch('/do-reply', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        const result = await response.json();
+                        
+                        socket.emit('new_reply', { ...data, _id: result._id });
+                        
+                        form.reset();
+                        form.style.display = 'none';
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
+            // Socket event listeners
+            socket.emit('increment_page_view', post_id);
+
+            socket.on('updated_views', function(data) {
+                if (post_id === data._id) {
+                    document.getElementById('views_count').textContent = `${data.views} Views`;
+                }
+            });
+
+            socket.on('new_comment', function(comment) {
+                const html = `
+                    <div class="comment-box animate-comment">
+                        <div class="d-flex">
+                            <img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="...">
+                            <div class="ms-3">
+                                <div class="fw-bold">${comment.username}</div>
+                                <p>${comment.comment}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('comment-section').insertAdjacentHTML('afterbegin', html);
+                updateCommentCount(1);
+            });
+
+            socket.on('new_reply', function(reply) {
+                const html = `
+                    <div class="d-flex mt-3">
+                        <img class="rounded-circle" src="https://dummyimage.com/40x40/ced4da/6c757d.jpg" alt="...">
+                        <div class="ms-3">
+                            <div class="fw-bold">${reply.name}</div>
+                            <p>${reply.reply}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById(`replies-${reply.comment_id}`).insertAdjacentHTML('beforeend', html);
+            });
+
+            // Like/Dislike functionality
+            const userId = "<%= locals.userId %>" || null;
+            const likeButton = document.getElementById('like-button');
+            const dislikeButton = document.getElementById('dislike-button');
+
+            if (!userId) {
+                likeButton.classList.add('disabled');
+                dislikeButton.classList.add('disabled');
+            }
+
+            likeButton.addEventListener('click', () => {
+                if (userId) socket.emit('like', { post_id, user_id: userId });
+            });
+
+            dislikeButton.addEventListener('click', () => {
+                if (userId) socket.emit('dislike', { post_id, user_id: userId });
+            });
+
+            socket.on('like_dislike', function(data) {
+                if (post_id === data.post_id) {
+                    document.getElementById('like').textContent = data.likes;
+                    document.getElementById('dislike').textContent = data.dislikes;
+                }
+            });
+
+            function updateCommentCount(increment) {
+                const countElement = document.getElementById('comment-count');
+                const currentCount = parseInt(countElement.textContent);
+                countElement.textContent = currentCount + increment;
             }
         });
-        //realtime like-dislike end
+    </script>
 
-    });
-</script>
-
-<%- include('./layouts/footer.ejs') %>
+    <%- include('./layouts/footer.ejs') %>
+</body>
+</html>

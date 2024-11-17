@@ -1,39 +1,351 @@
-<%- include('./layouts/header.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .register-container {
+            max-width: 450px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
 
-    <div class="container mb-5 mt-5">
-        <h1>Register</h1>
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-        <%
-            if(typeof message !== 'undefined'){
-                %>
-                <p style="color: green;"><%= message %></p>
-                <%
-            } 
-        %> 
+        .register-header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
 
-        <form action="" method="POST">
-            <div class="row">
-                <div class="col-sm-12">
-                    <input type="name" name="name" placeholder="Enter Name" required>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-sm-12">
-                    <input type="email" name="email" placeholder="Enter Email" required>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-sm-12">
-                    <input type="password" name="password" placeholder="Enter Password" required>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-sm-12">
-                    <input type="submit" value="Register" class="btn btn-info">
-                </div>
-            </div>
-        </form>
+        .register-header p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
 
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 1rem 0.8rem 2.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #bdc3c7;
+        }
+
+        .password-strength {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: #7f8c8d;
+        }
+
+        .password-strength span {
+            margin-right: 1rem;
+        }
+
+        .password-strength .requirement {
+            color: #95a5a6;
+        }
+
+        .password-strength .requirement.met {
+            color: #2ecc71;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 0.8rem;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn-register:hover {
+            background: #27ae60;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .register-footer a {
+            color: #2ecc71;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #95a5a6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-register.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-register.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .input-error {
+            font-size: 0.8rem;
+            color: #e74c3c;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .form-control.error {
+            border-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./layouts/header.ejs') %>
+
+    <div class="container">
+        <div class="register-container">
+            <div class="register-header">
+                <h1>Create Account</h1>
+                <p>Join our community today</p>
+            </div>
+
+            <% if(typeof message !== 'undefined') { %>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <%= message %>
+                </div>
+            <% } %>
+
+            <form action="" method="POST" id="registerForm">
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input 
+                        type="text" 
+                        name="name" 
+                        class="form-control" 
+                        
+                        required
+                        minlength="2"
+                        id="nameInput"
+                    >
+                    <div class="input-error" id="nameError">Please enter a valid name</div>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        class="form-control" 
+                        =
+                        required
+                        id="emailInput"
+                    >
+                    <div class="input-error" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        class="form-control" 
+                        
+                        required
+                        minlength="8"
+                        id="passwordInput"
+                    >
+                    <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+                    <div class="password-strength">
+                        <span class="requirement" id="length">8+ characters</span>
+                        <span class="requirement" id="uppercase">Uppercase</span>
+                        <span class="requirement" id="number">Number</span>
+                        <span class="requirement" id="special">Special character</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-register" id="registerButton">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="register-footer">
+                Already have an account? <a href="/login">Sign in</a>
+            </div>
+        </div>
     </div>
 
-<%- include('./layouts/footer.ejs') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordToggle = document.getElementById('passwordToggle');
+            const registerButton = document.getElementById('registerButton');
+            
+            // Password visibility toggle
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+
+            // Password strength checker
+            function checkPasswordStrength(password) {
+                const requirements = {
+                    length: password.length >= 8,
+                    uppercase: /[A-Z]/.test(password),
+                    number: /[0-9]/.test(password),
+                    special: /[!@#$%^&*]/.test(password)
+                };
+
+                Object.keys(requirements).forEach(req => {
+                    const element = document.getElementById(req);
+                    if (requirements[req]) {
+                        element.classList.add('met');
+                    } else {
+                        element.classList.remove('met');
+                    }
+                });
+
+                return Object.values(requirements).every(Boolean);
+            }
+
+            passwordInput.addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+            });
+
+            // Form validation
+            function validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            function validateName(name) {
+                return name.length >= 2 && /^[a-zA-Z\s]+$/.test(name);
+            }
+
+            const emailInput = document.getElementById('emailInput');
+            const nameInput = document.getElementById('nameInput');
+            
+            emailInput.addEventListener('input', function() {
+                const errorElement = document.getElementById('emailError');
+                if (!validateEmail(this.value)) {
+                    this.classList.add('error');
+                    errorElement.style.display = 'block';
+                } else {
+                    this.classList.remove('error');
+                    errorElement.style.display = 'none';
+                }
+            });
+
+            nameInput.addEventListener('input', function() {
+                const errorElement = document.getElementById('nameError');
+                if (!validateName(this.value)) {
+                    this.classList.add('error');
+                    errorElement.style.display = 'block';
+                } else {
+                    this.classList.remove('error');
+                    errorElement.style.display = 'none';
+                }
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                if (!validateEmail(emailInput.value) || !validateName(nameInput.value) || !checkPasswordStrength(passwordInput.value)) {
+                    e.preventDefault();
+                    return;
+                }
+
+                registerButton.classList.add('loading');
+                registerButton.disabled = true;
+            });
+        });
+    </script>
+
+    <%- include('./layouts/footer.ejs') %>
+</body>
+</html>

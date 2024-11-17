@@ -1,80 +1,85 @@
 <%- include('../layouts/admin-header.ejs') %>
-        <!-- Page Content  -->
-        <div id="content" class="p-4 p-md-5 pt-5">
-            <h2 class="mb-4">Dashboard</h2>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Title</th>
-                        <th>Content</th>
-                        <th>Image</th>
-                        <th>Delete</th>
-                        <th>Edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%
-                    if(posts.length > 0){
-                        var i = 1;
-                        posts.forEach(function(post){
-                            %>
-                            <tr>
-                                <td><%= i++; %></td>
-                                <td><%= post.title %></td>
-                                <td><%= post.content %></td>
-                                <td>
-                                    <img src="<%= post.image %>" alt="<%= post.image %>" width="100px">
-                                </td>
-                                <td>
-                                    <a href="#" class="btn btn-danger deletePost" data-id="<%= post._id %>">Delete</a>
-                                </td>
-                                <td>
-                                    <a href="/edit-post/<%= post._id %>" class="btn btn-warning">Edit</a>
-                                </td>
-                            </tr>
-                            <%
-                        });
-                    } 
-                    else{
-                        %>
+<!-- Page Content -->
+<div id="content" class="p-4 p-md-5 pt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Dashboard</h2>
+        <a href="/add-post" class="btn btn-primary">+ Add New Post</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (posts.length > 0) { %>
+                    <% let i = 1; %>
+                    <% posts.forEach(function(post) { %>
                         <tr>
-                            <td colspan="4">No Posts Found!</td>
+                            <td><%= i++ %></td>
+                            <td class="text-truncate" style="max-width: 150px;"><%= post.title %></td>
+                            <td class="text-truncate" style="max-width: 300px;"><%= post.content %></td>
+                            <td>
+                                <img src="<%= post.image %>" alt="Post Image" class="img-fluid rounded" width="100">
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="/edit-post/<%= post._id %>" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <button class="btn btn-danger btn-sm deletePost" data-id="<%= post._id %>">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                        <%
-                    }
-                    %> 
-                </tbody>
-            </table>
-
-        </div>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No Posts Found!</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script>
-    $(document).ready(function(){
-        $('.deletePost').click(function(){
-            var postId = $(this).attr('data-id');
-            var obj = $(this);
+    $(document).ready(function() {
+        $('.deletePost').click(function() {
+            const postId = $(this).data('id');
+            const row = $(this).closest('tr');
 
             $.ajax({
-                url:"/delete-post",
-                type:"POST",
-                data:{ id:postId },
-                success:function(response){
-                    if(response.success == true){
+                url: "/delete-post",
+                type: "POST",
+                data: { id: postId },
+                success: function(response) {
+                    if (response.success) {
+                        const socket = io();
+                        socket.emit("delete_post", postId);
 
-                        var socket = io();
-                        socket.emit("delete_post",postId);
-
-                        $(obj).parent().parent().remove();
+                        row.fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                        alert(response.msg);
+                    } else {
                         alert(response.msg);
                     }
-                    else{
-                        alert(response.msg);
-                    }
+                },
+                error: function() {
+                    alert("An error occurred. Please try again.");
                 }
             });
         });
     });
 </script>
+
 <%- include('../layouts/admin-footer.ejs') %>

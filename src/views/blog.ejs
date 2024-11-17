@@ -1,162 +1,271 @@
-<%- include('./layouts/header.ejs') %>
-
-<!-- Page Content-->
-<div class="container px-4 px-lg-5 posts">
-    <!-- Heading Row-->
-
-    <%
-    if(posts.length > 0){
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BMS - Blog Posts</title>
+    
+    <!-- Modern Bootstrap 5 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --light-gray: #f8f9fa;
+        }
         
-        for(let i = (posts.length-1); i >= 0; i--){
-
-            %>
-            <div class="row gx-4 gx-lg-5 align-items-center my-5" id="post-<%= posts[i]._id %>">
-                <div class="col-lg-7">
-                    <%
-                        if(posts[i].image !== undefined && posts[i].image !== ''){
-                            %>
-                            <img class="img-fluid rounded mb-4 mb-lg-0" src="<%= posts[i].image %>" alt="..." />
-                            <%
-                        }
-                        else{
-                            %>
-                                <img class="img-fluid rounded mb-4 mb-lg-0" src="https://dummyimage.com/900x400/dee2e6/6c757d.jpg" alt="..." />
-                            <%
-                        }
-                    %>
-                </div>
-                <div class="col-lg-5">
-                    <h1 class="font-weight-light"><%= posts[i].title %></h1>
-                    <p><%- posts[i].content %></p>
-                    <a class="btn btn-primary" href="/post/<%= posts[i]._id %>">Read More</a>
-                </div>
-            </div>
-            <%
-
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
         }
-    } 
-    else{
-        %>
-            <h1>Posts not available!</h1>
-        <%
-    }
-    %> 
+        
+        .post-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .post-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .post-content {
+            padding: 2rem;
+        }
+        
+        .post-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .post-text {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .read-more-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .read-more-btn:hover {
+            background-color: #2980b9;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .pagination-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        .pagination-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .no-posts {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Animation for new posts */
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .new-post {
+            animation: slideDown 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./layouts/header.ejs') %>
 
-</div>
+    <div class="container px-4 px-lg-5">
+        <div class="posts">
+            <% if(posts.length > 0) { %>
+                <% for(let i = posts.length-1; i >= 0; i--) { %>
+                    <div class="post-card" id="post-<%= posts[i]._id %>">
+                        <div class="row g-0">
+                            <div class="col-lg-7">
+                                <img class="post-image" 
+                                     src="<%= posts[i].image || 'https://dummyimage.com/900x400/dee2e6/6c757d.jpg' %>" 
+                                     alt="Post image" />
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="post-content">
+                                    <h2 class="post-title"><%= posts[i].title %></h2>
+                                    <div class="post-text"><%- posts[i].content %></div>
+                                    <a class="read-more-btn" href="/post/<%= posts[i]._id %>">
+                                        <i class="fas fa-arrow-right me-2"></i>Read More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="no-posts">
+                    <i class="fas fa-newspaper fa-3x mb-3"></i>
+                    <h2>No Posts Available</h2>
+                    <p class="text-muted">Check back later for new content!</p>
+                </div>
+            <% } %>
+        </div>
 
-<div class="container mb-3">
-    <div class="text-center">
-        <button class="btn btn-info" onclick="getPrevious()">Previous</button>
-        <button class="btn btn-info" onclick="getNext()">Next</button>
+        <div class="pagination-container mb-4">
+            <button class="pagination-btn" onclick="getPrevious()" id="prevBtn">
+                <i class="fas fa-chevron-left me-2"></i>Previous
+            </button>
+            <button class="pagination-btn" onclick="getNext()" id="nextBtn">
+                Next<i class="fas fa-chevron-right ms-2"></i>
+            </button>
+        </div>
     </div>
-</div>
 
-<script>
+    <%- include('./layouts/footer.ejs') %>
 
-    var start = 0;
-    var limit = "<%= postLimit %>";
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js"></script>
+    <script>
+        let start = 0;
+        const limit = "<%= postLimit %>";
 
-    function getNext()
-    {
-        start = start + limit;
-
-        $.ajax({
-            url:"/get-posts/"+start+"/"+limit,
-            type:"GET",
-            success:function(response){
-                renderPost(response);
-            }
-        });
-    }
-
-    function getPrevious()
-    {
-        start = start - limit;
-
-        $.ajax({
-            url:"/get-posts/"+start+"/"+limit,
-            type:"GET",
-            success:function(response){
-                renderPost(response);
-            }
-        });
-    }
-
-    function renderPost(posts){
-
-        if(posts.length > 0){
-
-            var html = '';
-
-            for(let i = 0; i < posts.length;i++){
-
-                var image = '';
-
-                if(posts[i].image !== undefined && posts[i].image !== ''){
-                                
-                    image =`<img class="img-fluid rounded mb-4 mb-lg-0" src="`+posts[i].image+`" alt="..." />`;
-                                
-                }
-                else{
-                                
-                    image = `<img class="img-fluid rounded mb-4 mb-lg-0" src="https://dummyimage.com/900x400/dee2e6/6c757d.jpg" alt="..." />`;
-                                
-                }
-
-                html +=`
-
-                <div class="row gx-4 gx-lg-5 align-items-center my-5" id="post-`+posts[i]._id+`">
-                    <div class="col-lg-7">
-                        `+image+`
-                    </div>
-                    <div class="col-lg-5">
-                        <h1 class="font-weight-light">`+posts[i].title+`</h1>
-                        <p>`+posts[i].content+`</p>
-                        <a class="btn btn-primary" href="/post/`+posts[i]._id+`">Read More</a>
-                    </div>
-                </div>
-
-                `;
-
-            }
-
-
-            $('.posts').html(html);
+        function updatePaginationButtons() {
+            document.getElementById('prevBtn').disabled = start === 0;
         }
 
-
-    }
-
-    var socket = io();
-
-    socket.on("delete_post",function(postId){
-        document.getElementById("post-"+postId).remove();
-    });
-
-    socket.on("new_post",function(formData){
-        // console.log(formData);
-        var html = "";
-        var image = "https://dummyimage.com/900x400/dee2e6/6c757d.jpg";
-        if(formData.image != ''){
-            image = formData.image;
+        async function getNext() {
+            start += limit;
+            const response = await fetch(`/get-posts/${start}/${limit}`);
+            const posts = await response.json();
+            renderPosts(posts);
+            updatePaginationButtons();
         }
-        html += `
-        <div class="row gx-4 gx-lg-5 align-items-center my-5">
-                <div class="col-lg-7">
-                    
-                    <img class="img-fluid rounded mb-4 mb-lg-0" src="`+image+`" alt="..." />
-                            
-                </div>
-                <div class="col-lg-5">
-                    <h1 class="font-weight-light">`+formData.title+`</h1>
-                    <p>`+formData.content+`</p>
-                    <a class="btn btn-primary" href="/post/`+formData._id+`">Read More</a>
-                </div>
-            </div>
-        `;
 
-        $('.posts').prepend(html);
-    })
-</script>
+        async function getPrevious() {
+            if (start >= limit) {
+                start -= limit;
+                const response = await fetch(`/get-posts/${start}/${limit}`);
+                const posts = await response.json();
+                renderPosts(posts);
+                updatePaginationButtons();
+            }
+        }
 
-<%- include('./layouts/footer.ejs') %> 
+        function renderPosts(posts) {
+            if (posts.length > 0) {
+                const html = posts.map(post => `
+                    <div class="post-card" id="post-${post._id}">
+                        <div class="row g-0">
+                            <div class="col-lg-7">
+                                <img class="post-image" 
+                                     src="${post.image || 'https://dummyimage.com/900x400/dee2e6/6c757d.jpg'}" 
+                                     alt="Post image" />
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="post-content">
+                                    <h2 class="post-title">${post.title}</h2>
+                                    <div class="post-text">${post.content}</div>
+                                    <a class="read-more-btn" href="/post/${post._id}">
+                                        <i class="fas fa-arrow-right me-2"></i>Read More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelector('.posts').innerHTML = html;
+            }
+        }
+
+        // Socket.io implementation
+        const socket = io();
+
+        socket.on("delete_post", (postId) => {
+            const post = document.getElementById(`post-${postId}`);
+            if (post) {
+                post.style.animation = 'slideDown 0.5s reverse';
+                setTimeout(() => post.remove(), 500);
+            }
+        });
+
+        socket.on("new_post", (formData) => {
+            const newPost = `
+                <div class="post-card new-post" id="post-${formData._id}">
+                    <div class="row g-0">
+                        <div class="col-lg-7">
+                            <img class="post-image" 
+                                 src="${formData.image || 'https://dummyimage.com/900x400/dee2e6/6c757d.jpg'}" 
+                                 alt="Post image" />
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="post-content">
+                                <h2 class="post-title">${formData.title}</h2>
+                                <div class="post-text">${formData.content}</div>
+                                <a class="read-more-btn" href="/post/${formData._id}">
+                                    <i class="fas fa-arrow-right me-2"></i>Read More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.posts').insertAdjacentHTML('afterbegin', newPost);
+        });
+
+        // Initialize pagination buttons
+        document.addEventListener('DOMContentLoaded', updatePaginationButtons);
+    </script>
+</body>
+</html>

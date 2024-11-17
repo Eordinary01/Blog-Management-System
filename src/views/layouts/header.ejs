@@ -1,61 +1,192 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BMS - Building Management System</title>
+    
+    <!-- Modern Bootstrap 5 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 for better icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white !important;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            color: var(--secondary-color) !important;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white !important;
+        }
+        
+        .btn-login, .btn-register {
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login {
+            background-color: transparent;
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color) !important;
+        }
+        
+        .btn-login:hover {
+            background-color: var(--secondary-color);
+            color: white !important;
+        }
+        
+        .btn-register {
+            background-color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            color: white !important;
+        }
+        
+        .btn-register:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .logout-btn {
+            background-color: var(--accent-color);
+            color: white !important;
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem !important;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Add animation for menu toggle */
+        .navbar-collapse {
+            transition: all 0.3s ease;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 991.98px) {
+            .navbar-nav {
+                padding: 1rem 0;
+            }
+            
+            .nav-link {
+                padding: 0.75rem 1rem !important;
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#!">
+                <i class="fas fa-building me-2"></i>BMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#!">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-chart-line me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item logout">
+                        <a class="nav-link logout-btn" href="/user-logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                    <li class="nav-item login">
+                        <a class="nav-link btn-login mx-2" href="/login">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item login">
+                        <a class="nav-link btn-register" href="/register">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Modern Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+        }
 
-    <title>BMS</title>
-    <link rel="stylesheet" href="../style.css">
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <link href="../css/styles.css" rel="stylesheet" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js" integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  </head>
-  <body>
-    <!-- Responsive navbar-->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container px-5">
-          <a class="navbar-brand" href="#!">BMS</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                  <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                  <li class="nav-item"><a class="nav-link" href="/dashboard" target="_blank">Dashboard</a></li>
-                  <li class="nav-item logout"><a class="nav-link" href="/user-logout">Logout</a></li>
-                  <li class="nav-item login"><a class="nav-link" href="/login">Login</a></li>
-                  <li class="nav-item login"><a class="nav-link" href="/register">Register</a></li>
-              </ul>
-          </div>
-      </div>
-  </nav>
-
-  <script>
-    function getCookie(name) {
-      let matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-      ));
-      return matches ? decodeURIComponent(matches[1]) : undefined;
-    }
-    var userData = null;
-    var userId = null;
-    if(getCookie('user') === undefined){
-      document.getElementsByClassName('logout')[0].style.display = 'none';
-      document.getElementsByClassName('login')[0].style.display = 'block';
-      document.getElementsByClassName('login')[1].style.display = 'block';
-    }
-    else{
-      userData = JSON.parse(getCookie('user'));
-      userId = userData._id;
-      document.getElementsByClassName('logout')[0].style.display = 'block';
-      document.getElementsByClassName('login')[0].style.display = 'none';
-      document.getElementsByClassName('login')[1].style.display = 'none';
-    }
-    console.log(userId)
-  </script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = getCookie('user');
+            const logoutItems = document.getElementsByClassName('logout');
+            const loginItems = document.getElementsByClassName('login');
+            
+            if (!userData) {
+                Array.from(logoutItems).forEach(item => item.style.display = 'none');
+                Array.from(loginItems).forEach(item => item.style.display = 'block');
+            } else {
+                const user = JSON.parse(userData);
+                const userId = user._id;
+                Array.from(logoutItems).forEach(item => item.style.display = 'block');
+                Array.from(loginItems).forEach(item => item.style.display = 'none');
+                console.log('User ID:', userId);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,36 +1,260 @@
-<%- include('./layouts/header.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 450px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
 
-    <div class="container mb-5 mt-5">
-        <h1>Login</h1>
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-        <%
-            if(typeof message !== 'undefined'){
-                %>
-                <p style="color: red;"><%= message %></p>
-                <%
-            } 
-        %> 
+        .login-header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
 
-        <form action="" method="POST">
-            <div class="row">
-                <div class="col-sm-12">
-                    <input type="email" name="email" placeholder="Enter Email" required>
-                </div>
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #bdc3c7;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #ef4444;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.8rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: #2980b9;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .forgot-password {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #95a5a6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading state */
+        .btn-login.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-login.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <%- include('./layouts/header.ejs') %>
+
+    <div class="container">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Welcome Back</h1>
+                <p>Please enter your credentials to continue</p>
             </div>
-            <div class="row mt-3">
-                <div class="col-sm-12">
-                    <input type="password" name="password" placeholder="Enter Password" required>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-sm-12">
-                    <input type="submit" value="Login" class="btn btn-info">
-                </div>
-            </div>
-        </form>
 
-        <a href="/forget-password">Forget Password</a>
+            <% if(typeof message !== 'undefined') { %>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <%= message %>
+                </div>
+            <% } %>
 
+            <form action="" method="POST" id="loginForm">
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        class="form-control" 
+                        
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        class="form-control" 
+                        
+                        required
+                        id="passwordInput"
+                    >
+                    <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginButton">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <a href="/forget-password" class="forgot-password">
+                    <i class="fas fa-key me-1"></i>
+                    Forgot your password?
+                </a>
+            </div>
+        </div>
     </div>
 
-<%- include('./layouts/footer.ejs') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password visibility toggle
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+
+            // Form submission handling
+            const loginForm = document.getElementById('loginForm');
+            const loginButton = document.getElementById('loginButton');
+
+            loginForm.addEventListener('submit', function(e) {
+                // Add loading state
+                loginButton.classList.add('loading');
+                loginButton.disabled = true;
+
+                // Simulate removing loading state after response
+                // Remove this timeout in production and handle based on actual form submission
+                setTimeout(() => {
+                    loginButton.classList.remove('loading');
+                    loginButton.disabled = false;
+                }, 2000);
+            });
+
+            // Autofocus email field on page load
+            const emailInput = document.querySelector('input[name="email"]');
+            if (emailInput) emailInput.focus();
+
+            // Handle enter key
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !loginButton.disabled) {
+                    loginForm.submit();
+                }
+            });
+        });
+    </script>
+
+    <%- include('./layouts/footer.ejs') %>
+</body>
+</html>
